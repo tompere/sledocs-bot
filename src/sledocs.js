@@ -1,3 +1,5 @@
+const algoliasearch = require('algoliasearch');
+
 function parseItem(item) {
   const [k, v] = item.split('=');
   return {[k]: v};
@@ -10,11 +12,18 @@ function parseSlackBody(raw) {
   }), {});
 }
 
+function initAlgolia() {
+  const client = algoliasearch('BH4D9OD16A', process.env.ALGOLIA_API_KEY);
+  return client.initIndex('wix_sled');
+}
+
 module.exports = async (event) => {
   const {text} = parseSlackBody(event.body);
+  const index = initAlgolia();
+  const data = await index.search({query: text});
   return {
     statusCode: 200,
-    body: `searched! 💪 ${text}`,
+    body: `searched! 💪 ${text}.\nresult is ${JSON.stringify(data, null, 2)}`,
   };
 };
 

@@ -12,10 +12,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/algoliasearch": "^3.30.17",
     "eslint": "^6.1.0",
     "eslint-config-google": "^0.13.0",
     "jest": "^24.8.0",
     "serverless": "^1.49.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "algoliasearch": "^3.33.0"
+  }
 }
