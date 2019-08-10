@@ -1,3 +1,13 @@
 {
-  "extends": "google"
+  "extends": "google",
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "rules": {
+    "require-jsdoc": 0
+  }
 }
