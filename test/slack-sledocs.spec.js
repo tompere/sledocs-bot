@@ -26,8 +26,14 @@ describe('sledocs', () => {
     });
 
     expect(parseResults).toHaveBeenCalledWith(mockSearchResults);
-    expect(mockSearch).toHaveBeenCalledWith({query: text});
+    expect(mockSearch).toHaveBeenCalledWith({
+      query: text,
+      hitsPerPage: 3,
+      typoTolerance: false,
+      distinct: 1,
+    });
     expect(statusCode).toBe(200);
-    expect(body).toBe(`searched! '${text}'\nresult is:\n"pretty results"`);
+    expect(body).toContain(`searched! '${text}'`);
+    expect(body).toContain(`result is:\n"pretty results`);
   });
 });

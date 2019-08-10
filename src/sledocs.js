@@ -3,11 +3,15 @@ const {parseSlackBody} = require('./slack-utils');
 
 module.exports = async (event) => {
   const {text} = parseSlackBody(event.body);
-  const index = initAlgolia();
-  const data = await index.search({query: text});
-  const results = JSON.stringify(parseResults(data), null, 2);
+  const algoliaResults = await initAlgolia().search({
+    query: text,
+    hitsPerPage: 3,
+    typoTolerance: false,
+    distinct: 1,
+  });
+  const parsedResults = JSON.stringify(parseResults(algoliaResults), null, 2);
   return {
     statusCode: 200,
-    body: `searched! '${text}'\nresult is:\n${results}`,
+    body: `:rocket: searched! '${text}'\n:star: result is:\n${parsedResults}`,
   };
 };
