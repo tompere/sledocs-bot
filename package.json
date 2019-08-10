@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "algoliasearch": "^3.33.0",
-    "lodash": "^4.17.15",
-    "unescape": "^1.0.1"
+    "html-entities": "^1.2.1",
+    "lodash": "^4.17.15"
   }
 }

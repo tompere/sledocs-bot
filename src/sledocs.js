@@ -1,10 +1,12 @@
 const {initAlgolia, parseResults} = require('./algolia-utils');
 const {parseSlackBody} = require('./slack-utils');
-const decode = require('unescape');
+const Entities = require('html-entities').AllHtmlEntities;
+
+const entities = new Entities();
 
 module.exports = async (event) => {
   const {text, channel_id: channel} = parseSlackBody(event.body);
-  const query = decode(text);
+  const query = entities.decode(text);
   const algoliaResults = await initAlgolia().search({
     query,
     hitsPerPage: 3,
@@ -12,29 +14,34 @@ module.exports = async (event) => {
     distinct: 1,
   });
   const results = parseResults(algoliaResults);
-  const docReferences = results.map(({breadcrumbs, url}) => ({
-    type: 'section',
-    text: {
-      'type': 'mrkdwn',
-      'text': `*${breadcrumbs.join(' > ')}* <${url}|Read>`,
-    },
-  }));
-  const header = [{
-    type: 'section',
-    text: {
-      'type': 'mrkdwn',
-      'text': `:owl: Here all docs reference I found for *${query}*:`,
-    },
-  },
-  {
-    'type': 'divider',
-  }];
+  const docReferences = results.map(
+      ({breadcrumbs, url}) => `- ${breadcrumbs.join(' • ')} <${url}|read>`)
+      .join('\n');
+  const body = {
+    channel,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          'type': 'mrkdwn',
+          'text': `Here are all the docs reference I found for query _${query}_:`,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: docReferences,
+        },
+      },
+      {
+        type: 'divider',
+      },
+    ],
+  };
   return {
     statusCode: 200,
     headers: {'content-type': 'application/json'},
-    body: JSON.stringify({
-      channel,
-      blocks: header.concat(docReferences),
-    }),
+    body: JSON.stringify(body),
   };
 };
