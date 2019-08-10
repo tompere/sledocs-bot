@@ -4,7 +4,7 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "lint": "eslint --config .eslintrc.json **/*.js --fix",
+    "lint": "eslint --config .eslintrc.json . --fix",
     "pretest": "npm run lint",
     "test": "jest",
     "deploy": "npm test && serverless deploy"
@@ -13,12 +13,14 @@
   "license": "ISC",
   "devDependencies": {
     "@types/algoliasearch": "^3.30.17",
+    "@types/jest": "^24.0.17",
     "eslint": "^6.1.0",
     "eslint-config-google": "^0.13.0",
     "jest": "^24.8.0",
     "serverless": "^1.49.0"
   },
   "dependencies": {
-    "algoliasearch": "^3.33.0"
+    "algoliasearch": "^3.33.0",
+    "lodash": "^4.17.15"
   }
 }
