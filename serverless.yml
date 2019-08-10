@@ -21,7 +21,7 @@ org: tompere
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs8.10
 
 # you can overwrite defaults here
 #  stage: dev

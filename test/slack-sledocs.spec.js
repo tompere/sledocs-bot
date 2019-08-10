@@ -14,7 +14,16 @@ describe('sledocs', () => {
     initAlgolia.mockReturnValue({
       search: mockSearch,
     });
-    parseResults.mockReturnValue('pretty results');
+    parseResults.mockReturnValue([
+      {
+        breadcrumbs: ['a', 'b', 'c'],
+        url: 'www.wham.com/abc',
+      },
+      {
+        breadcrumbs: ['e', 'f'],
+        url: 'www.wham.com/ef',
+      },
+    ]);
   });
 
   it('should return text from slack', async () => {
@@ -33,7 +42,34 @@ describe('sledocs', () => {
       distinct: 1,
     });
     expect(statusCode).toBe(200);
-    expect(body).toContain(`searched! '${text}'`);
-    expect(body).toContain(`result is:\n"pretty results`);
+    expect(body).toEqual(JSON.stringify({
+      channel: 'CM7KFBKBP',
+      blocks: [
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': ':owl: Here all docs reference I found for *wham-bam*:',
+          },
+        },
+        {
+          'type': 'divider',
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*a > b > c* <www.wham.com/abc|Read>',
+          },
+        },
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*e > f* <www.wham.com/ef|Read>',
+          },
+        },
+      ],
+    }));
   });
 });
