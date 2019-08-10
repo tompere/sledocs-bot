@@ -1,5 +1,5 @@
 const {initAlgolia, parseResults} = require('./algolia-utils');
-const {parseSlackBody} = require('./slack-utils');
+const {parseSlackBody, formatMessage} = require('./slack-utils');
 const Entities = require('html-entities').AllHtmlEntities;
 
 const entities = new Entities();
@@ -14,34 +14,9 @@ module.exports = async (event) => {
     distinct: 1,
   });
   const results = parseResults(algoliaResults);
-  const docReferences = results.map(
-      ({breadcrumbs, url}) => `- ${breadcrumbs.join(' • ')} <${url}|read>`)
-      .join('\n');
-  const body = {
-    channel,
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          'type': 'mrkdwn',
-          'text': `Here are all the docs reference I found for query _${query}_:`,
-        },
-      },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: docReferences,
-        },
-      },
-      {
-        type: 'divider',
-      },
-    ],
-  };
   return {
     statusCode: 200,
     headers: {'content-type': 'application/json'},
-    body: JSON.stringify(body),
+    body: JSON.stringify(formatMessage(results, {channel, query})),
   };
 };
