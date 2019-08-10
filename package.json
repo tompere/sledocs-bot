@@ -1,0 +1,22 @@
+{
+  "name": "sled-docs-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "lint": "eslint --config .eslintrc.json **/*.js --fix",
+    "pretest": "npm run lint",
+    "test": "jest",
+    "deploy": "npm test && serverless deploy"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.13.0",
+    "jest": "^24.8.0"
+  },
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
