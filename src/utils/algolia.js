@@ -19,8 +19,7 @@ function parseSingleHit(hit) {
 }
 
 function parseResults(results) {
-  const {hits} = results;
-  return _(hits).map(parseSingleHit).value();
+  return results.hits.map(parseSingleHit);
 }
 
 async function search(query) {
