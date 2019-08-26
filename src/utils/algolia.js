@@ -1,9 +1,11 @@
 const algoliasearch = require('algoliasearch');
 const _ = require('lodash');
 
+let index;
+
 function initAlgolia() {
   const client = algoliasearch('BH4D9OD16A', process.env.ALGOLIA_API_KEY);
-  return client.initIndex('wix_sled');
+  index = client.initIndex('wix_sled');
 }
 
 function parseSingleHit(hit) {
@@ -21,4 +23,16 @@ function parseResults(results) {
   return _(hits).map(parseSingleHit).value();
 }
 
-module.exports = {initAlgolia, parseResults};
+async function search(query) {
+  if (!index) {
+    initAlgolia();
+  }
+  return index.search({
+    query,
+    hitsPerPage: 3,
+    typoTolerance: false,
+    distinct: 1,
+  });
+}
+
+module.exports = {parseResults, search};

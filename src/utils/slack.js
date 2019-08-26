@@ -40,9 +40,7 @@ function sanitizeSnippet(raw) {
   return r.trim().replace(/\s\s/, ' ');
 }
 
-
-// https://api.slack.com/tools/block-kit-builder
-function formatMessage(hits, {channel, query}) {
+function formatFoundResultsMessage(query, hits) {
   const results = hits.map(({breadcrumbs, url, snippet}, i) => {
     const _title = `${i + 1}. <${url}|${_.last(breadcrumbs)}>`;
     breadcrumbs.pop();
@@ -57,18 +55,36 @@ function formatMessage(hits, {channel, query}) {
       },
     };
   });
+  return [
+    {
+      type: 'section',
+      text: {
+        'type': 'mrkdwn',
+        'text': `Here are all the docs reference I found for search query _*${query}*_:`,
+      },
+    },
+    ...results,
+  ];
+}
+
+function formatNoResultsMessage(query) {
+  return [
+    {
+      type: 'section',
+      text: {
+        'type': 'mrkdwn',
+        'text': `No docs were found for search query _*${query}*_:`,
+      },
+    },
+  ];
+}
+
+// https://api.slack.com/tools/block-kit-builder
+function formatMessage(hits, {channel, query}) {
+  const blocks = _.isEmpty(hits) ? formatNoResultsMessage(query) : formatFoundResultsMessage(query, hits);
   return {
     channel,
-    blocks: [
-      {
-        type: 'section',
-        text: {
-          'type': 'mrkdwn',
-          'text': `Here are all the docs reference I found for query _*${query}*_:`,
-        },
-      },
-      ...results,
-    ],
+    blocks,
   };
 }
 
