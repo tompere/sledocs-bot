@@ -1,7 +1,7 @@
 'use strict';
 
-const sledocsHandler = require('./src/sledocs');
+const sledocs = require('./src/sledocs');
 
 module.exports = {
-  sledocs: sledocsHandler,
+  sledocs,
 };

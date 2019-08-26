@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
 const sledocs = require('../src/sledocs');
-const {initAlgolia, parseResults} = require('../src/algolia-utils');
+const {initAlgolia, parseResults} = require('../src/utils/algolia');
 
-jest.mock('../src/algolia-utils');
+jest.mock('../src/utils/algolia');
 
 describe('sledocs', () => {
   let mockSearch;
@@ -17,12 +17,19 @@ describe('sledocs', () => {
     });
     parseResults.mockReturnValue([
       {
-        breadcrumbs: ['a', 'b', 'c'],
-        url: 'www.wham.com/abc',
+        breadcrumbs: ['Basic Usage', 'Local debugging', 'Adding breakpoint to your test'],
+        url: 'www.x.com',
+        snippet: 'Install  Nim <span class=\"algolia-docsearch-suggestion--highlight\">Chrome</span> extention  ',
       },
       {
-        breadcrumbs: ['e', 'f'],
-        url: 'www.wham.com/ef',
+        breadcrumbs: ['Under The Hood', 'Cloud Vendors Benchmarks'],
+        url: 'www.y.com',
+        snippet: 'Puppeteer benchmark was done using  <span class=\"algolia-docsearch-suggestion--highlight\">chrome</span>-aws-lambda v1.16',
+      },
+      {
+        breadcrumbs: ['Getting Started', 'A Really Quick Start', 'Authentication'],
+        url: 'www.z.com',
+        snippet: null,
       },
     ]);
   });
@@ -43,27 +50,39 @@ describe('sledocs', () => {
       distinct: 1,
     });
     expect(statusCode).toBe(200);
-    expect(body).toEqual(JSON.stringify({
+    const expectedResults = [
+      {
+        'type': 'section',
+        'text': {
+          'type': 'mrkdwn',
+          'text': 'Here are all the docs reference I found for query _*wham-bam*_:',
+        },
+      },
+      {
+        'type': 'section',
+        'text': {
+          'type': 'mrkdwn',
+          'text': '1. <www.x.com|Adding breakpoint to your test>\n> Install Nim *Chrome* extention\n(_Basic Usage • Local debugging_)',
+        },
+      },
+      {
+        'type': 'section',
+        'text': {
+          'type': 'mrkdwn',
+          'text': '2. <www.y.com|Cloud Vendors Benchmarks>\n> Puppeteer benchmark was done using *chrome*-aws-lambda v1.16\n(_Under The Hood_)',
+        },
+      },
+      {
+        'type': 'section',
+        'text': {
+          'type': 'mrkdwn',
+          'text': '3. <www.z.com|Authentication>\n(_Getting Started • A Really Quick Start_)',
+        },
+      },
+    ];
+    expect(JSON.stringify(JSON.parse(body), null, 2)).toEqual(JSON.stringify({
       channel: 'CM7KFBKBP',
-      blocks: [
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': `Here are all the docs reference I found for query _wham-bam_:`,
-          },
-        },
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': `- a • b • c <www.wham.com/abc|read>\n- e • f <www.wham.com/ef|read>`,
-          },
-        },
-        {
-          'type': 'divider',
-        },
-      ],
-    }));
+      blocks: expectedResults,
+    }, null, 2));
   });
 });

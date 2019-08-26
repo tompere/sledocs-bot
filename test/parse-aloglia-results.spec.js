@@ -1,4 +1,4 @@
-const {parseResults} = require('../src/algolia-utils');
+const {parseResults} = require('../src/utils/algolia');
 const mockResult = require('./mocks/mock-algolia-results');
 
 describe('parse aloglia results', () => {

@@ -7,11 +7,12 @@ function initAlgolia() {
 }
 
 function parseSingleHit(hit) {
-  const {hierarchy, url} = hit;
+  const {hierarchy, url, _snippetResult} = hit;
   const breadcrumbs = _(hierarchy).filter(_.isString).value();
   return {
     breadcrumbs,
     url,
+    snippet: _.get(_snippetResult, ['content', 'value']),
   };
 }
 

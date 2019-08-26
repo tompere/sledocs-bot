@@ -1,5 +1,5 @@
-const {initAlgolia, parseResults} = require('./algolia-utils');
-const {parseSlackBody, formatMessage} = require('./slack-utils');
+const {initAlgolia, parseResults} = require('./utils/algolia');
+const {parseSlackBody, formatMessage} = require('./utils/slack');
 const Entities = require('html-entities').AllHtmlEntities;
 
 const entities = new Entities();
@@ -13,10 +13,10 @@ module.exports = async (event) => {
     typoTolerance: false,
     distinct: 1,
   });
-  const results = parseResults(algoliaResults);
+  const hits = parseResults(algoliaResults);
   return {
     statusCode: 200,
     headers: {'content-type': 'application/json'},
-    body: JSON.stringify(formatMessage(results, {channel, query})),
+    body: JSON.stringify(formatMessage(hits, {channel, query})),
   };
 };
