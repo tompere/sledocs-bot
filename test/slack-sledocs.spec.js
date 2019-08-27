@@ -7,7 +7,7 @@ jest.mock('../src/utils/algolia');
 const MOCK_CHANNEL_ID = 'CM7KFBKBP';
 
 describe('sledocs', () => {
-  const mockBody = ({text}) => `token=1nAm2GHEXEyAklFzPU0zd65a&team_id=TM18CJRBK&team_domain=tomp-personal&channel_id=${MOCK_CHANNEL_ID}&channel_name=general&user_id=UM7K8QNAC&user_name=tomp&command=%2Fsledocs&text=${text}&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FTM18CJRBK%2F722004961236%2Fz6klTADxeDeM6DRXnwlFHovG&trigger_id=711032798515.715284637393.1474955833da7dc35f9a68bf7bcabcbf`;
+  const mockBody = ({text}) => `token=1nAm2GHEXEyAklFzPU0zd65a&team_id=TM18CJRBK&team_domain=tomp-personal&channel_id=${MOCK_CHANNEL_ID}&channel_name=general&user_id=UM7K8QNAC&user_name=tomp&command=%2Fsledocs&text=${encodeURIComponent(text)}&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FTM18CJRBK%2F722004961236%2Fz6klTADxeDeM6DRXnwlFHovG&trigger_id=711032798515.715284637393.1474955833da7dc35f9a68bf7bcabcbf`;
   const mockSearchResults = {hello: 'result'};
 
   it('should return text from slack', async () => {
@@ -28,7 +28,7 @@ describe('sledocs', () => {
         snippet: null,
       },
     ]);
-    const text = 'wham-bam';
+    const text = 'sled wham-bam';
     search.mockReturnValue(mockSearchResults);
 
     const {statusCode, body} = await sledocs({
@@ -36,7 +36,7 @@ describe('sledocs', () => {
     });
 
     expect(parseResults).toHaveBeenCalledWith(mockSearchResults);
-    expect(search).toHaveBeenCalledWith(text);
+    expect(search).toHaveBeenCalledWith('sled', 'wham-bam');
     expect(statusCode).toBe(200);
     const expectedResults = [
       {
@@ -76,8 +76,7 @@ describe('sledocs', () => {
 
   it('should create empty response', async () => {
     parseResults.mockReturnValue([]);
-    const text = 'wham-bam';
-    // search.mockReturnValue(mockSearchResults);
+    const text = 'yoshi wham-bam';
     const {statusCode, body} = await sledocs({
       body: mockBody({text}),
     });
@@ -94,5 +93,64 @@ describe('sledocs', () => {
         },
       ],
     }));
+  });
+
+  describe('negative tests', () => {
+    it('should throw error for unsupported project', async () => {
+      const {statusCode, body} = await sledocs({
+        body: mockBody({text: 'tom search-me'}),
+      });
+      expect(statusCode).toBe(200);
+      expect(body).toEqual(JSON.stringify({
+        channel: MOCK_CHANNEL_ID,
+        blocks: [
+          {
+            'type': 'section',
+            'text': {
+              'type': 'mrkdwn',
+              'text': ':failure: This project docs are not supported, we only support [sled, yoshi]\n(command was _tom search-me_)',
+            },
+          },
+        ],
+      }));
+    });
+
+    it('should throw error for empty command', async () => {
+      const {statusCode, body} = await sledocs({
+        body: mockBody({text: ''}),
+      });
+      expect(statusCode).toBe(200);
+      expect(body).toEqual(JSON.stringify({
+        channel: MOCK_CHANNEL_ID,
+        blocks: [
+          {
+            'type': 'section',
+            'text': {
+              'type': 'mrkdwn',
+              'text': ':failure: You sent an empty command...',
+            },
+          },
+        ],
+      }));
+    });
+
+    it('should throw error for empty search query', async () => {
+      const {statusCode, body} = await sledocs({
+        body: mockBody({text: 'sled '}),
+      });
+      expect(statusCode).toBe(200);
+      expect(body).toEqual(JSON.stringify({
+        channel: MOCK_CHANNEL_ID,
+        blocks: [
+          {
+            'type': 'section',
+            'text': {
+              'type': 'mrkdwn',
+              'text': ':failure: You sent an empty search query...',
+            },
+          },
+        ],
+      }));
+    });
   });
 });

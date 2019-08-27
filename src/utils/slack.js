@@ -67,6 +67,21 @@ function formatFoundResultsMessage(query, hits) {
   ];
 }
 
+function formatErrorMessage(channel, error) {
+  return {
+    channel,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          'type': 'mrkdwn',
+          'text': `:failure: ${error.message || ''}`,
+        },
+      },
+    ],
+  };
+}
+
 function formatNoResultsMessage(query) {
   return [
     {
@@ -88,4 +103,4 @@ function formatMessage(hits, {channel, query}) {
   };
 }
 
-module.exports = {parseSlackBody, formatMessage};
+module.exports = {parseSlackBody, formatMessage, formatErrorMessage};
