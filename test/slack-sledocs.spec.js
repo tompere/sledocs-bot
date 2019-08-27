@@ -108,7 +108,7 @@ describe('sledocs', () => {
             'type': 'section',
             'text': {
               'type': 'mrkdwn',
-              'text': ':failure: This project docs are not supported, we only support [sled, yoshi]\n(command was _tom search-me_)',
+              'text': ':failure: This project docs are not supported, we only support [sled, yoshi]',
             },
           },
         ],

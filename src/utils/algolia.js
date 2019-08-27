@@ -6,12 +6,16 @@ const SUPPORTED_APPS = {
     key: '9616f11f6088f2e451210554e14314e4',
     index: 'wix_sled',
     instance: null,
+    options: {},
   },
   yoshi:
   {
     key: '5807169f7e8a322a659ac4145a3e5d8a',
     index: 'wix_yoshi',
     instance: null,
+    options: {
+      filters: 'version:4.x',
+    },
   },
 };
 
@@ -34,19 +38,18 @@ function parseSingleHit(hit) {
 }
 
 function parseResults(results) {
-  return _(results.hits)
-      .map(parseSingleHit)
-      .uniqBy(({url}) => url)
-      .slice(0, 3)
-      .value();
+  return results.hits.map(parseSingleHit);
 }
 
 async function search(appId, query) {
-  const instance = SUPPORTED_APPS[appId].instance || initAlgolia(appId);
-  return instance.search({
+  const {instance, options} = SUPPORTED_APPS[appId];
+  const index = instance || initAlgolia(appId);
+  return index.search({
     query,
+    hitsPerPage: 5,
     typoTolerance: false,
     distinct: 1,
+    ...options,
   });
 }
 
